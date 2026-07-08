@@ -8,7 +8,7 @@ The container is created once and started by the host scheduler every 5 minutes:
 
 ```bash
 # For required env variables
-docker compose --env-file environments/prod/.env up --no-start --build --force-recreate fortinet_socaas
+docker compose --env-file environments/prod/.${CUSTOMER_ID}_env up --no-start --build --force-recreate fortinet_socaas
 ```
 
 Cron example with overlap protection:
@@ -27,6 +27,7 @@ The job exits after one collection cycle:
 Provide these variables through a Compose env file or the runtime environment:
 
 ```env
+CUSTOMER_ID=
 COLLECTOR_IP=
 COLLECTOR_PORT=
 FORTICLOUD_AUTH_URL=
@@ -40,7 +41,7 @@ Production defaults to HTTPS-only for `FORTINET_SOCAAS_URL`. The optional `FORTI
 
 ## State
 
-Runtime state is persisted at `/app/state`, mounted from `./state` by Compose:
+Runtime state is persisted at `/app/state`, mounted from `./state/${CUSTOMER_ID}` by Compose:
 
 - `creds.json`: OAuth token cache.
 - `last_run.txt`: end timestamp from the last successful run.
@@ -52,7 +53,7 @@ Runtime state is persisted at `/app/state`, mounted from `./state` by Compose:
 Create or recreate the stopped job container after code or environment changes:
 
 ```bash
-docker compose --env-file environments/prod/.env up --no-start --build --force-recreate fortinet_socaas
+docker compose --env-file environments/prod/.${CUSTOMER_ID}_env up --no-start --build --force-recreate fortinet_socaas
 ```
 
 Start one run manually:
@@ -71,8 +72,8 @@ docker inspect fortinet_socaas --format '{{.State.ExitCode}}'
 Check persisted state:
 
 ```bash
-ls -l state
-cat state/last_run.txt
+ls -l state/${CUSTOMER_ID}
+cat state/${CUSTOMER_ID}/last_run.txt
 ```
 
 ## Development Integration Test
@@ -89,10 +90,10 @@ docker wait fortinet_socaas
 Verify:
 
 ```bash
-docker logs fortinet_socaas
+docker logs ${CUSTOMER_ID}_fortinet_socaas
 docker logs fortiauth_demo
 docker logs syslog_demo
-docker inspect fortinet_socaas --format '{{.State.ExitCode}}'
+docker inspect ${CUSTOMER_ID}_fortinet_socaas --format '{{.State.ExitCode}}'
 ```
 
 Expected evidence:

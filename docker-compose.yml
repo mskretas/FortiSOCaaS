@@ -12,9 +12,9 @@ services:
       FORTINET_SOCAAS_CLIENT_ID: ${FORTINET_SOCAAS_CLIENT_ID}
       FORTINET_SOCAAS_ALLOW_INSECURE_HTTP: ${FORTINET_SOCAAS_ALLOW_INSECURE_HTTP:-false}
     volumes:
-      - ./state:/app/state
+      - ./state/${CUSTOMER_ID}:/app/state
     restart: "no"
-    container_name: fortinet_socaas
+    container_name: ${CUSTOMER_ID}_fortinet_socaas
 
   fortiauth_demo:
     profiles:
