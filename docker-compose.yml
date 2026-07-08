@@ -1,0 +1,38 @@
+services:
+  fortinet_socaas:
+    build:
+      dockerfile: ./dockerfiles/fortinet_socaas_Dockerfile
+    environment:
+      COLLECTOR_IP: ${COLLECTOR_IP}
+      COLLECTOR_PORT: ${COLLECTOR_PORT}
+      FORTICLOUD_AUTH_URL: ${FORTICLOUD_AUTH_URL}
+      FORTINET_SOCAAS_URL: ${FORTINET_SOCAAS_URL}
+      FORTINET_SOCAAS_API_ID: ${FORTINET_SOCAAS_API_ID}
+      FORTINET_SOCAAS_PASSWORD: ${FORTINET_SOCAAS_PASSWORD}
+      FORTINET_SOCAAS_CLIENT_ID: ${FORTINET_SOCAAS_CLIENT_ID}
+      FORTINET_SOCAAS_ALLOW_INSECURE_HTTP: ${FORTINET_SOCAAS_ALLOW_INSECURE_HTTP:-false}
+    volumes:
+      - ./state:/app/state
+    restart: "no"
+    container_name: fortinet_socaas
+
+  fortiauth_demo:
+    profiles:
+      - dev
+    build:
+      dockerfile: ./dockerfiles/fortiauth_demo_Dockerfile
+    ports:
+      - 8000:8000
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/docs', timeout=2)"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+    container_name: fortiauth_demo
+
+  syslog_demo:
+    profiles:
+      - dev
+    build:
+      dockerfile: ./dockerfiles/syslog_demo_Dockerfile
+    container_name: syslog_demo

@@ -1,0 +1,19 @@
+FROM python:3.10.12-alpine
+
+RUN addgroup -S appuser
+RUN adduser -S appuser -G appuser
+
+WORKDIR /app
+
+COPY requirements.txt ./requirements.txt
+
+RUN pip install --no-cache-dir --upgrade -r requirements.txt
+RUN mkdir -p /app/state
+RUN chown -R appuser:appuser /app
+
+USER appuser
+COPY --chown=appuser:appuser src/ ./src
+
+COPY --chown=appuser:appuser app.py ./app.py
+
+CMD ["python", "app.py"]

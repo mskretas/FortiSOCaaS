@@ -1,0 +1,16 @@
+FROM python:3.10.12-alpine
+
+RUN addgroup -S appuser
+RUN adduser -S appuser -G appuser
+
+WORKDIR /app
+
+COPY fortiauth_demo_requirements.txt ./requirements.txt
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY fortiauth_demo.py ./main.py
+
+USER appuser
+
+CMD ["fastapi", "run", "main.py"]
